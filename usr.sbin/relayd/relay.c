@@ -2259,6 +2259,27 @@ relay_tls_ctx_create(struct relay *rlay)
 		}
 		rlay->rl_tls_cacert_fd = -1;
 
+		if (rlay->rl_tls_client_ca_fd != -1) {
+			if ((buf = relay_load_fd(rlay->rl_tls_client_ca_fd,
+			    &len)) ==
+			    NULL) {
+				log_warn(
+				    "failed to read tls client CA certificate");
+				goto err;
+			}
+
+			if (tls_config_set_ca_mem(tls_cfg, buf, len) != 0) {
+				log_warnx(
+				    "failed to set tls client CA cert: %s",
+				    tls_config_error(tls_cfg));
+				goto err;
+			}
+			purge_key(&buf, len);
+
+			tls_config_verify_client(tls_cfg);
+		}
+		rlay->rl_tls_client_ca_fd = -1;
+
 		tls = tls_server();
 		if (tls == NULL) {
 			log_warnx("unable to allocate TLS context");

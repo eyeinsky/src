@@ -139,11 +139,12 @@ struct ctl_relaytable {
 };
 
 enum fd_type {
-	RELAY_FD_CERT	= 1,
-	RELAY_FD_CACERT	= 2,
-	RELAY_FD_CAFILE	= 3,
-	RELAY_FD_KEY	= 4,
-	RELAY_FD_OCSP	= 5
+	RELAY_FD_CERT		= 1,
+	RELAY_FD_CACERT		= 2,
+	RELAY_FD_CAFILE		= 3,
+	RELAY_FD_KEY		= 4,
+	RELAY_FD_OCSP		= 5,
+	RELAY_FD_CLIENTCACERT	= 6
 };
 
 struct ctl_relayfd {
@@ -401,6 +402,7 @@ union hashkey {
 #define F_TLSINSPECT		0x04000000
 #define F_HASHKEY		0x08000000
 #define F_AGENTX_TRAPONLY	0x10000000
+#define F_TLSVERIFY		0x20000000
 
 #define F_BITS								\
 	"\10\01DISABLE\02BACKUP\03USED\04DOWN\05ADD\06DEL\07CHANGED"	\
@@ -744,6 +746,7 @@ struct protocol {
 	char			 tlscacert[PATH_MAX];
 	char			 tlscakey[PATH_MAX];
 	char			*tlscapass;
+	char			 tlsclientca[PATH_MAX];
 	struct keynamelist	 tlscerts;
 	char			 name[MAX_NAME_SIZE];
 	int			 tickets;
@@ -833,6 +836,7 @@ struct relay {
 
 	int			 rl_tls_ca_fd;
 	int			 rl_tls_cacert_fd;
+	int			 rl_tls_client_ca_fd;
 	EVP_PKEY		*rl_tls_pkey;
 	X509			*rl_tls_cacertx509;
 	char			*rl_tls_cakey;

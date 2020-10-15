@@ -956,6 +956,15 @@ config_setrelay(struct relayd *env, struct relay *rlay)
 					    rlay->rl_conf.name);
 					return (-1);
 				}
+				if (rlay->rl_tls_client_ca_fd != -1 &&
+				    config_setrelayfd(ps, id, n, 0,
+				    rlay->rl_conf.id, RELAY_FD_CLIENTCACERT,
+				    rlay->rl_tls_client_ca_fd) == -1) {
+					log_warn("%s: fd passing failed for "
+					    "`%s'", __func__,
+					    rlay->rl_conf.name);
+					return (-1);
+				}
 				/* Prevent fd exhaustion in the parent. */
 				if (proc_flush_imsg(ps, id, n) == -1) {
 					log_warn("%s: failed to flush "
@@ -989,6 +998,10 @@ config_setrelay(struct relayd *env, struct relay *rlay)
 		close(rlay->rl_s);
 		rlay->rl_s = -1;
 	}
+	if (rlay->rl_tls_client_ca_fd != -1) {
+		close(rlay->rl_tls_client_ca_fd);
+		rlay->rl_tls_client_ca_fd = -1;
+	}
 	if (rlay->rl_tls_cacert_fd != -1) {
 		close(rlay->rl_tls_cacert_fd);
 		rlay->rl_tls_cacert_fd = -1;
@@ -1014,6 +1027,10 @@ config_setrelay(struct relayd *env, struct relay *rlay)
 			cert->cert_ocsp_fd = -1;
 		}
 	}
+	if (rlay->rl_tls_client_ca_fd != -1) {
+		close(rlay->rl_tls_client_ca_fd);
+		rlay->rl_tls_client_ca_fd = -1;
+	}
 
 	return (0);
 }
@@ -1036,6 +1053,7 @@ config_getrelay(struct relayd *env, struct imsg *imsg)
 	rlay->rl_s = imsg->fd;
 	rlay->rl_tls_ca_fd = -1;
 	rlay->rl_tls_cacert_fd = -1;
+	rlay->rl_tls_client_ca_fd = -1;
 
 	if (ps->ps_what[privsep_process] & CONFIG_PROTOS) {
 		if (rlay->rl_conf.proto == EMPTY_ID)
@@ -1164,6 +1182,9 @@ config_getrelayfd(struct relayd *env, struct imsg *imsg)
 		break;
 	case RELAY_FD_CAFILE:
 		rlay->rl_tls_cacert_fd = imsg->fd;
+		break;
+	case RELAY_FD_CLIENTCACERT:
+		rlay->rl_tls_client_ca_fd = imsg->fd;
 		break;
 	}
 

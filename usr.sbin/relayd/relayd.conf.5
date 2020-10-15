@@ -946,6 +946,10 @@ will be used (strong crypto cipher suites without anonymous DH).
 See the CIPHERS section of
 .Xr openssl 1
 for information about SSL/TLS cipher suites and preference lists.
+.It Ic client ca Ar path
+Require TLS client certificates whose authenticity can be verified
+against the CA certificate(s) in the specified file in order to
+proceed beyond the TLS handshake.
 .It Ic client-renegotiation
 Allow client-initiated renegotiation.
 To mitigate a potential DoS risk,

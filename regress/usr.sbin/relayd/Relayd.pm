@@ -84,6 +84,9 @@ sub new {
 		print $fh "\n\ttls ca cert ca.crt";
 		print $fh "\n\ttls ca key ca.key password ''";
 	}
+	if ($self->{verifyclient}) {
+		print $fh "\n\ttls client ca client-ca.crt";
+	}
 	# substitute variables in config file
 	foreach (@protocol) {
 		s/(\$[a-z]+)/$1/eeg;

@@ -1359,6 +1359,15 @@ relay_load_certfiles(struct relayd *env, struct relay *rlay, const char *name)
 	if ((rlay->rl_conf.flags & F_TLS) == 0)
 		return (0);
 
+	if (strlen(proto->tlsclientca) &&
+	    rlay->rl_tls_client_ca_fd == -1) {
+		if ((rlay->rl_tls_client_ca_fd =
+		    open(proto->tlsclientca, O_RDONLY)) == -1)
+			return (-1);
+		log_debug("%s: using client ca %s", __func__,
+		    proto->tlsclientca);
+	}
+
 	if (name == NULL &&
 	    print_host(&rlay->rl_conf.ss, hbuf, sizeof(hbuf)) == NULL)
 		goto fail;

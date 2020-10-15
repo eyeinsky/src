@@ -57,6 +57,11 @@ sub child {
 	    PeerAddr		=> $self->{connectaddr},
 	    PeerPort		=> $self->{connectport},
 	    SSL_verify_mode	=> SSL_VERIFY_NONE,
+	    SSL_use_cert	=> $self->{offertlscert} ? 1 : 0,
+	    SSL_cert_file	=> $self->{offertlscert} ?
+	                               "client.crt" : "",
+	    SSL_key_file	=> $self->{offertlscert} ?
+	                               "client.key" : "",
 	) or die ref($self), " $iosocket socket connect failed: $!,$SSL_ERROR";
 	if ($self->{sndbuf}) {
 		setsockopt($cs, SOL_SOCKET, SO_SNDBUF,
@@ -86,6 +91,14 @@ sub child {
 		print STDERR "ssl cipher: ",$cs->get_cipher(),"\n";
 		print STDERR "ssl peer certificate:\n",
 		    $cs->dump_peer_certificate();
+
+		if ($self->{offertlscert}) {
+			print STDERR "ssl client certificate:\n";
+			print STDERR "Subject Name: ",
+				"${\$cs->sock_certificate('subject')}\n";
+			print STDERR "Issuer  Name: ",
+				"${\$cs->sock_certificate('issuer')}\n";
+		}
 	}
 
 	*STDIN = *STDOUT = $self->{cs} = $cs;
