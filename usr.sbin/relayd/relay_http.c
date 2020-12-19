@@ -1194,6 +1194,14 @@ relay_expand_http(struct ctl_relay_event *cre, char *val, char *buf,
 			return (NULL);
 	}
 
+	if (strstr(val, "$CLIENT_CERT") != NULL) {
+          // For now, just replicate expanding $REMOTE_ADDR
+          if (print_host(&cre->ss, ibuf, sizeof(ibuf)) == NULL)
+            return (NULL);
+          if (expand_string(buf, len, "$CLIENT_CERT", ibuf) != 0)
+            return (NULL);
+	}
+
 	return (buf);
 }
 
