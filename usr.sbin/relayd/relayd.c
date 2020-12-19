@@ -1359,6 +1359,9 @@ relay_load_certfiles(struct relayd *env, struct relay *rlay, const char *name)
 	if ((rlay->rl_conf.flags & F_TLS) == 0)
 		return (0);
 
+        // if (1) there is tlsclientca and (2) rlay->rl_tls_client_ca_fd is -1
+        // then open the file as read only
+        // if open fail then return -1
 	if (strlen(proto->tlsclientca) &&
 	    rlay->rl_tls_client_ca_fd == -1) {
 		if ((rlay->rl_tls_client_ca_fd =

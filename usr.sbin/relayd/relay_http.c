@@ -86,6 +86,7 @@ static struct http_error	 http_errors[] = HTTP_ERRORS;
 void
 relay_http(struct relayd *x_env)
 {
+        log_info("RELAY_HTTP");
 	if (x_env != NULL)
 		env = x_env;
 

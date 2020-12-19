@@ -214,6 +214,7 @@ struct ctl_relay_event {
 	struct ctl_relay_event	*dst;
 	struct rsession		*con;
 
+        // this:
 	struct tls		*tls;
 	struct tls_config	*tls_cfg;
 	struct tls		*tls_ctx;
